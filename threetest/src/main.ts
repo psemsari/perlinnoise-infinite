@@ -39,7 +39,7 @@ function map_range(value : number, low1 : number, high1: number, low2 : number, 
 let buffer = new THREE.BufferAttribute(result, 3)
 geometry.setAttribute('position', buffer)
 console.log(geometry, geometry.getAttribute('position'))
-const wireframe = new THREE.MeshBasicMaterial( { color: 0x950404, wireframe: true, visible: true } );
+const wireframe = new THREE.MeshBasicMaterial( { color: 0x950404, wireframe: true, visible: false } );
 const material = new THREE.MeshStandardMaterial( { color: 0xD8A47F, visible: true } );
 //const material = new THREE.MeshDepthMaterial({ color: 0xffffff, wireframe: true })
 const cube = new THREE.Mesh( geometry, material );
@@ -48,14 +48,20 @@ cubewireframe.rotation.x = -Math.PI / 2 //https://www.alloprof.qc.ca/fr/eleves/b
 cube.rotation.x = -Math.PI / 2
 scene.add( cube, cubewireframe );
 
-const light = new THREE.PointLight(0xffffff)
-light.position.set(-10,10,5)
-scene.add(light)
+// const light = new THREE.PointLight(0xffffff)
+// light.position.set(-10,10,5)
+// scene.add(light)
 
-const pointLightHelper = new THREE.PointLightHelper( light );
-scene.add( pointLightHelper );
+// const pointLightHelper = new THREE.PointLightHelper( light );
+// scene.add( pointLightHelper );
+
+const directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
+scene.add( directionalLight );
+
+
 const axesHelper = new THREE.AxesHelper( 5 );
 scene.add( axesHelper );
+
 const controls = new MapControls( camera, renderer.domElement );
 controls.mouseButtons = {
 	LEFT: THREE.MOUSE.PAN,
