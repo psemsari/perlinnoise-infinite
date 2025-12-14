@@ -25,10 +25,9 @@ a:hover {
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  overflow: hidden; /* Empêcher le scroll pour une expérience fullscreen */
 }
 
 h1 {
@@ -81,6 +80,41 @@ button:hover {
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
+}
+
+/* Styles pour les sliders du panneau de contrôle */
+#noise-control-panel input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+#noise-control-panel input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  background: #AECC6F;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+#noise-control-panel input[type="range"]::-webkit-slider-thumb:hover {
+  background: #B8D67A;
+}
+
+#noise-control-panel input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  background: #AECC6F;
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+  transition: background 0.2s;
+}
+
+#noise-control-panel input[type="range"]::-moz-range-thumb:hover {
+  background: #B8D67A;
 }
 
 @media (prefers-color-scheme: light) {
