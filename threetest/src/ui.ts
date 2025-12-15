@@ -139,6 +139,14 @@ export function createControlPanel() {
   // Ajouter tous les contrôles
   panel.appendChild(createCheckbox('Animation', 'animate'))
   panel.appendChild(createCheckbox('Wireframe', 'showWireframe'))
+
+  // Contrôles FBM / bruit
+  panel.appendChild(createCheckbox('Utiliser FBM', 'useFBM'))
+  panel.appendChild(createSlider('Octaves FBM', 'fbmOctaves', 1, 8, 1))
+  panel.appendChild(createSlider('Lacunarité FBM', 'fbmLacunarity', 1.0, 4.0, 0.1))
+  panel.appendChild(createSlider('Gain FBM', 'fbmGain', 0.1, 1.0, 0.05))
+
+  // Taille du terrain
   panel.appendChild(createSlider('Largeur terrain', 'planeWidth', 20, 300, 1))
   panel.appendChild(createSlider('Hauteur terrain', 'planeHeight', 20, 300, 1))
   panel.appendChild(createSlider('Vitesse Animation', 'flyingSpeed', -0.1, 0.1, 0.001))

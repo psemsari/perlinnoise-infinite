@@ -9,6 +9,11 @@ export type NoiseParams = {
   showWireframe: boolean
   planeWidth: number
   planeHeight: number
+  // FBM (Fractal Brownian Motion)
+  useFBM: boolean
+  fbmOctaves: number
+  fbmLacunarity: number
+  fbmGain: number
 }
 
 export const noiseParams: NoiseParams = {
@@ -22,6 +27,10 @@ export const noiseParams: NoiseParams = {
   showWireframe: true, // Afficher ou masquer le maillage wireframe
   planeWidth: 100,     // Largeur "physique" du terrain
   planeHeight: 100,    // Hauteur "physique" du terrain
+  useFBM: false,       // Utiliser le FBM ou un simple bruit
+  fbmOctaves: 4,       // Nombre d'octaves pour le FBM
+  fbmLacunarity: 2.0,  // Multiplicateur de fréquence entre les octaves
+  fbmGain: 0.5,        // Facteur de réduction d'amplitude entre les octaves
 }
 
 

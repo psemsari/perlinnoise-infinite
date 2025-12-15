@@ -16,7 +16,9 @@ const geometry = new THREE.PlaneGeometry(BASE_WIDTH, BASE_HEIGHT, cols, rows)
 const attribute = geometry.getAttribute('position')
 const array = attribute.array as Float32Array
 let result = new Float32Array(array)
-const noise = SN.createNoise2D()
+
+// Bruit 3D (remplace le bruit 2D précédent)
+const noise3D = SN.createNoise3D()
 
 // Height thresholds / colors
 const phase_color = {
@@ -84,6 +86,37 @@ function map_range(value: number, low1: number, high1: number, low2: number, hig
 }
 
 /**
+ * FBM 3D (Fractal Brownian Motion) basé sur simplex-noise
+ * Combine plusieurs octaves de bruit avec fréquence croissante et amplitude décroissante.
+ */
+function fbm3D(x: number, y: number, z: number): number {
+  let total = 0
+  let amplitude = 1
+  let maxAmplitude = 0
+
+  // On part des échelles de bruit de base et on les augmente avec la lacunarité
+  let freqX = noiseParams.noiseScaleX
+  let freqY = noiseParams.noiseScaleY
+  let freqZ = noiseParams.noiseScaleX // on peut réutiliser l'échelle X pour Z
+
+  const octaves = Math.max(1, Math.floor(noiseParams.fbmOctaves))
+
+  for (let i = 0; i < octaves; i++) {
+    const value = noise3D(x * freqX, y * freqY, z * freqZ) // simplex-noise retourne ~[-1, 1]
+    total += value * amplitude
+    maxAmplitude += amplitude
+
+    amplitude *= noiseParams.fbmGain
+    freqX *= noiseParams.fbmLacunarity
+    freqY *= noiseParams.fbmLacunarity
+    freqZ *= noiseParams.fbmLacunarity
+  }
+
+  // Normaliser le résultat du FBM dans [0, 1]
+  return maxAmplitude > 0 ? map_range(total, -maxAmplitude, maxAmplitude, 0, 1) : 0.5
+}
+
+/**
  * Generates and updates terrain using simplex noise
  * Creates animated terrain by continuously shifting the noise sampling position
  */
@@ -92,7 +125,7 @@ function noise_map() {
   if (noiseParams.animate) {
     flying += noiseParams.flyingSpeed
   }
-  let yoff = noiseParams.yOffset + flying // Start Y offset from current flying value
+  let yoff = noiseParams.yOffset // décalage de base en Y
 
   // Iterate through all vertices in the grid
   for (let y = 0; y <= rows; y++) {
@@ -101,8 +134,13 @@ function noise_map() {
       // Calculate index for Z coordinate (height) in the vertex array
       let i = (y * count_xvertice * count_coord) + (x * count_coord) + zoffset
 
-      // Sample noise at current position and map to height range using parameters
-      let height = map_range(noise(xoff, yoff), 0, 1, noiseParams.heightMin, noiseParams.heightMax)
+      // Sample noise 3D (simple ou FBM) à la position courante
+      const baseValue = noiseParams.useFBM
+        ? fbm3D(xoff, yoff, flying)
+        : map_range(noise3D(xoff, yoff, flying), -1, 1, 0, 1) // normaliser le bruit simple dans [0,1]
+
+      // Mapper la valeur normalisée [0,1] vers la plage de hauteurs désirée
+      const height = map_range(baseValue, 0, 1, noiseParams.heightMin, noiseParams.heightMax)
       result[i] = height
 
       // Calculate index for color coordinates (X, Y, Z of vertex)
