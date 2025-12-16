@@ -1,13 +1,15 @@
 export type FBMOctaveParams = {
   enabled: boolean
-  gain: number
-  lacunarity: number
+  amplitude: number
+  frequency: number
 }
 
 export type NoiseParams = {
   flyingSpeed: number
   noiseScaleX: number
   noiseScaleY: number
+  amplitude: number
+  frequency: number
   heightMin: number
   heightMax: number
   yOffset: number
@@ -21,7 +23,11 @@ export type NoiseParams = {
   useFBM: boolean
   fbmOctaves: number
   fbmLacunarity: number
-  fbmGain: number
+  fbmInitialFrequency: number
+  fbmAmplitudeDecay: number
+  fbmInitialAmplitude: number
+  fbmAmplitude: number
+  fbmFrequency: number
   fbmOctavesParams: FBMOctaveParams[]
 }
 
@@ -29,25 +35,31 @@ const FBM_OCTAVES_MAX = 8
 
 export const noiseParams: NoiseParams = {
   flyingSpeed: -0.001, // Vitesse d'animation (négatif = animation vers l'avant)
-  noiseScaleX: 0.015,  // Échelle du bruit sur l'axe X (plus petit = plus de détails)
-  noiseScaleY: 0.015,  // Échelle du bruit sur l'axe Y
-  heightMin: -10,      // Hauteur minimale du terrain
+  noiseScaleX: 0.050,  // Échelle du bruit sur l'axe X (plus petit = plus de détails)
+  noiseScaleY: 0.050,  // Échelle du bruit sur l'axe Y
+  amplitude: 10,
+  frequency: 2,
+  heightMin: -20,      // Hauteur minimale du terrain
   heightMax: 0,        // Hauteur maximale du terrain
   yOffset: 0,          // Offset Y initial pour le bruit
   animate: true,       // Activer/désactiver l'animation
-  showWireframe: true, // Afficher ou masquer le maillage wireframe
+  showWireframe: false, // Afficher ou masquer le maillage wireframe
   planeWidth: 100,     // Largeur "physique" du terrain
   planeHeight: 100,    // Hauteur "physique" du terrain
-  cols: 10,            // Nombre de colonnes (segments) dans la grille
-  rows: 10,            // Nombre de lignes (segments) dans la grille
-  useFBM: false,       // Utiliser le FBM ou un simple bruit
-  fbmOctaves: 4,       // Nombre d'octaves pour le FBM
+  cols: 500,            // Nombre de colonnes (segments) dans la grille
+  rows: 500,            // Nombre de lignes (segments) dans la grille
+  useFBM: true,       // Utiliser le FBM ou un simple bruit
+  fbmOctaves: 1,       // Nombre d'octaves pour le FBM
   fbmLacunarity: 2.0,  // Multiplicateur de fréquence entre les octaves
-  fbmGain: 0.5,        // Facteur de réduction d'amplitude entre les octaves
+  fbmInitialFrequency: 0.5,        // Fréquence initiale pour le FBM
+  fbmAmplitudeDecay: 1.0,        // Décay de l'amplitude entre les octaves
+  fbmInitialAmplitude: 3.0,        // Amplitude initiale pour le FBM
+  fbmAmplitude: 1.0,        // Amplitude pour le FBM
+  fbmFrequency: 2.0,        // Multiplicateur de fréquence entre les octaves
   fbmOctavesParams: Array.from({ length: FBM_OCTAVES_MAX }, () => ({
     enabled: true,
-    gain: 1.0,
-    lacunarity: 1.0,
+    amplitude: 1.0,
+    frequency: 1.0,
   })),
 }
 

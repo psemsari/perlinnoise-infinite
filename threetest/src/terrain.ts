@@ -84,36 +84,34 @@ function map_range(value: number, low1: number, high1: number, low2: number, hig
  * FBM 3D (Fractal Brownian Motion) basé sur simplex-noise
  * Combine plusieurs octaves de bruit avec fréquence croissante et amplitude décroissante.
  */
-function fbm3D(x: number, y: number, z: number): number {
+function fbm2(x: number, y: number): number {
   let total = 0
-  let amplitude = 1
-  let maxAmplitude = 0
+  let octaves = noiseParams.fbmOctaves
 
-  // On part des échelles de bruit de base et on les augmente avec la lacunarité
-  let freqX = noiseParams.noiseScaleX
-  let freqY = noiseParams.noiseScaleY
-  let freqZ = noiseParams.noiseScaleX // on peut réutiliser l'échelle X pour Z
 
-  const octaves = Math.max(1, Math.min(Math.floor(noiseParams.fbmOctaves), noiseParams.fbmOctavesParams.length))
-
-  for (let i = 0; i < octaves; i++) {
-    const octaveParams = noiseParams.fbmOctavesParams[i]
-
-    if (octaveParams.enabled) {
-      const value = noise3D(x * freqX, y * freqY, z * freqZ) // simplex-noise retourne ~[-1, 1]
-      total += value * amplitude
-      maxAmplitude += amplitude
+  for (let i = 1; i <= octaves; i++) {
+    let params = noiseParams.fbmOctavesParams[i]
+    if (params.enabled) {
+      if (i === 1) {
+        let frequency = noiseParams.fbmInitialFrequency
+        let amplitude = noiseParams.fbmInitialAmplitude
+        total += noise(x / frequency, y / frequency) * amplitude
+      } else {
+        let frequency = noiseParams.fbmInitialFrequency * (noiseParams.fbmLacunarity * i - 1)
+        let amplitude = noiseParams.fbmInitialAmplitude * (noiseParams.fbmAmplitudeDecay * i - 1)
+        total += noise(x / frequency, y / frequency) * amplitude
+      }
     }
-
-    // Appliquer les paramètres globaux + par-octave pour la prochaine itération
-    amplitude *= noiseParams.fbmGain * octaveParams.gain
-    freqX *= noiseParams.fbmLacunarity * octaveParams.lacunarity
-    freqY *= noiseParams.fbmLacunarity * octaveParams.lacunarity
-    freqZ *= noiseParams.fbmLacunarity * octaveParams.lacunarity
   }
 
-  // Normaliser le résultat du FBM dans [0, 1]
-  return maxAmplitude > 0 ? map_range(total, -maxAmplitude, maxAmplitude, 0, 1) : 0.5
+  return total / octaves
+}
+
+function hnoise(x: number, y: number): number {
+  let amplitude = noiseParams.amplitude
+  let frequency = noiseParams.frequency
+
+  return amplitude * noise(x * frequency, y * frequency)
 }
 
 /**
@@ -127,6 +125,7 @@ function noise_map() {
   }
   let yoff = noiseParams.yOffset // décalage de base en Y
 
+
   // Iterate through all vertices in the grid
   for (let y = 0; y <= noiseParams.rows; y++) {
     let xoff = 0 // Reset X offset for each row
@@ -135,9 +134,7 @@ function noise_map() {
       let i = (y * count_xvertice * count_coord) + (x * count_coord) + zoffset
 
       // Sample noise 3D (simple ou FBM) à la position courante
-      const baseValue = noiseParams.useFBM
-        ? fbm3D(xoff, yoff, flying)
-        : map_range(noise3D(xoff, yoff, flying), 0, 1, noiseParams.heightMin, noiseParams.heightMax) // normaliser le bruit simple dans [0,1]
+      const baseValue = noiseParams.useFBM ? fbm2(xoff, yoff) : hnoise(xoff, yoff) // normaliser le bruit simple dans [0,1]
 
       // Mapper la valeur normalisée [0,1] vers la plage de hauteurs désirée
       const height = baseValue
@@ -147,9 +144,9 @@ function noise_map() {
       i = (y * count_xvertice * count_coord) + (x * count_coord)
 
       // Base color for all vertices
-      color[i] = phase_color.water.r
-      color[i + 1] = phase_color.water.g
-      color[i + 2] = phase_color.water.b
+      color[i] = phase_color.grey.r
+      color[i + 1] = phase_color.grey.g
+      color[i + 2] = phase_color.grey.b
 
       // Increment X offset for next column (controls noise scale)
       xoff += noiseParams.noiseScaleX

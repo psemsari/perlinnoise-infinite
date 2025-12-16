@@ -36,6 +36,7 @@ export function createControlPanel() {
     color: #fff;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     padding-bottom: 10px;
+    text-align: center;
   `
   panel.appendChild(title)
 
@@ -219,15 +220,19 @@ export function createControlPanel() {
   // Bruit de base
   baseNoiseSection.appendChild(createSlider('Échelle Bruit X', 'noiseScaleX', 0.001, 0.1, 0.001))
   baseNoiseSection.appendChild(createSlider('Échelle Bruit Y', 'noiseScaleY', 0.001, 0.1, 0.001))
-  baseNoiseSection.appendChild(createSlider('Hauteur Min', 'heightMin', -20, 10, 0.5))
-  baseNoiseSection.appendChild(createSlider('Hauteur Max', 'heightMax', -10, 20, 0.5))
   baseNoiseSection.appendChild(createSlider('Offset Y', 'yOffset', -10, 10, 0.1))
+  baseNoiseSection.appendChild(createSlider('Amplitude', 'amplitude', 1, 100, 1))
+  baseNoiseSection.appendChild(createSlider('Fréquence', 'frequency', 0.1, 10, 0.1))
 
   // Contrôles FBM / bruit global
   fbmGlobalSection.appendChild(createCheckbox('Utiliser FBM', 'useFBM'))
   fbmGlobalSection.appendChild(createSlider('Octaves FBM', 'fbmOctaves', 1, 8, 1))
-  fbmGlobalSection.appendChild(createSlider('Lacunarité FBM', 'fbmLacunarity', 1.0, 4.0, 0.1))
-  fbmGlobalSection.appendChild(createSlider('Gain FBM', 'fbmGain', 0.1, 1.0, 0.05))
+  fbmGlobalSection.appendChild(createSlider('Lacunarité FBM', 'fbmLacunarity', 2, 100.0, 1))
+  fbmGlobalSection.appendChild(createSlider('Amplitude initiale FBM', 'fbmInitialAmplitude', 0.1, 100.0, 0.1))
+  fbmGlobalSection.appendChild(createSlider('Amp Decay', 'fbmAmplitudeDecay', 0.1, 5.0, 0.1))
+  fbmGlobalSection.appendChild(createSlider('Fréquence initiale FBM', 'fbmInitialFrequency', 0.1, 50.0, 0.1))
+  fbmGlobalSection.appendChild(createSlider('Amplitude FBM', 'fbmAmplitude', 0.1, 100.0, 0.1))
+  fbmGlobalSection.appendChild(createSlider('Fréquence FBM', 'fbmFrequency', 0.1, 100.0, 0.1))
 
   // Contrôles détaillés par octave FBM
   const fbmDetailsTitle = document.createElement('h4')
@@ -268,12 +273,12 @@ export function createControlPanel() {
     header.appendChild(enableCheckbox)
     container.appendChild(header)
 
-    // Slider gain
+    // Slider amplitude
     const gainContainer = document.createElement('div')
     gainContainer.style.cssText = 'display: flex; align-items: center; gap: 8px; margin-bottom: 4px;'
 
     const gainLabel = document.createElement('span')
-    gainLabel.textContent = 'Gain'
+    gainLabel.textContent = 'Amplitude'
     gainLabel.style.cssText = 'font-size: 11px; color: rgba(255, 255, 255, 0.7); min-width: 40px;'
 
     const gainSlider = document.createElement('input')
@@ -281,16 +286,16 @@ export function createControlPanel() {
     gainSlider.min = '0.1'
     gainSlider.max = '2.0'
     gainSlider.step = '0.05'
-    gainSlider.value = octave.gain.toString()
+    gainSlider.value = octave.amplitude.toString()
     gainSlider.style.cssText = 'flex: 1;'
 
     const gainValue = document.createElement('span')
-    gainValue.textContent = octave.gain.toFixed(2)
+    gainValue.textContent = octave.amplitude.toFixed(2)
     gainValue.style.cssText = 'font-size: 11px; color: #AECC6F; min-width: 38px; text-align: right;'
 
     gainSlider.addEventListener('input', (e) => {
       const v = parseFloat((e.target as HTMLInputElement).value)
-      noiseParams.fbmOctavesParams[index].gain = v
+      noiseParams.fbmOctavesParams[index].amplitude = v
       gainValue.textContent = v.toFixed(2)
     })
 
@@ -312,16 +317,16 @@ export function createControlPanel() {
     lacSlider.min = '0.5'
     lacSlider.max = '3.0'
     lacSlider.step = '0.05'
-    lacSlider.value = octave.lacunarity.toString()
+    lacSlider.value = octave.frequency.toString()
     lacSlider.style.cssText = 'flex: 1;'
 
     const lacValue = document.createElement('span')
-    lacValue.textContent = octave.lacunarity.toFixed(2)
+    lacValue.textContent = octave.frequency.toFixed(2)
     lacValue.style.cssText = 'font-size: 11px; color: #AECC6F; min-width: 38px; text-align: right;'
 
     lacSlider.addEventListener('input', (e) => {
       const v = parseFloat((e.target as HTMLInputElement).value)
-      noiseParams.fbmOctavesParams[index].lacunarity = v
+      noiseParams.fbmOctavesParams[index].frequency = v
       lacValue.textContent = v.toFixed(2)
     })
 
