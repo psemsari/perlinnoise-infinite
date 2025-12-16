@@ -3,11 +3,12 @@ import { cube, cubewireframe, noise_map } from './terrain'
 import { createScene } from './scene'
 import { createControlPanel } from './ui'
 
+// Créer l'interface de contrôle pour les paramètres de bruit
+createControlPanel()
+
 // Initialisation de la scène, de la caméra, du renderer et des contrôles
 const { scene, camera, renderer } = createScene(cube, cubewireframe)
 
-// Créer l'interface de contrôle pour les paramètres de bruit
-createControlPanel()
 
 // Générer un premier terrain puis démarrer la boucle d'animation
 noise_map()

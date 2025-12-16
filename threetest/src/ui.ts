@@ -39,6 +39,74 @@ export function createControlPanel() {
   `
   panel.appendChild(title)
 
+  // Conteneur des onglets et du contenu
+  const tabsBar = document.createElement('div')
+  tabsBar.style.cssText = `
+    display: flex;
+    gap: 6px;
+    margin-bottom: 10px;
+  `
+
+  const contentContainer = document.createElement('div')
+  contentContainer.style.cssText = `
+    margin-top: 4px;
+  `
+
+  panel.appendChild(tabsBar)
+  panel.appendChild(contentContainer)
+
+  // Gestion des sections/volets
+  const sections: HTMLElement[] = []
+  const tabButtons: HTMLButtonElement[] = []
+
+  function setActiveSection(index: number) {
+    sections.forEach((section, i) => {
+      section.style.display = i === index ? 'block' : 'none'
+    })
+    tabButtons.forEach((btn, i) => {
+      btn.style.background = i === index ? 'rgba(255, 255, 255, 0.15)' : 'transparent'
+      btn.style.color = i === index ? '#fff' : 'rgba(255, 255, 255, 0.7)'
+    })
+  }
+
+  function createSectionTab(label: string) {
+    const index = sections.length
+
+    const button = document.createElement('button')
+    button.textContent = label
+    button.style.cssText = `
+      border: none;
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      cursor: pointer;
+      background: transparent;
+      color: rgba(255, 255, 255, 0.7);
+    `
+    button.addEventListener('click', () => setActiveSection(index))
+    tabsBar.appendChild(button)
+    tabButtons.push(button)
+
+    const section = document.createElement('div')
+    section.style.display = 'none'
+    contentContainer.appendChild(section)
+    sections.push(section)
+
+    // Activer le premier par défaut
+    if (index === 0) {
+      setActiveSection(0)
+    }
+
+    return section
+  }
+
+  // Création des différents volets
+  const generalSection = createSectionTab('Général')
+  const terrainSection = createSectionTab('Terrain')
+  const baseNoiseSection = createSectionTab('Bruit de base')
+  const fbmGlobalSection = createSectionTab('FBM global')
+  const fbmOctavesSection = createSectionTab('FBM par octave')
+
   // Fonction helper pour créer un contrôle slider
   function createSlider(label: string, key: keyof typeof noiseParams, min: number, max: number, step: number = 0.001) {
     const container = document.createElement('div')
@@ -88,7 +156,7 @@ export function createControlPanel() {
       valueDisplay.textContent = value.toFixed(3)
 
       // Si on modifie la taille du terrain, on applique immédiatement les changements
-      if (key === 'planeWidth' || key === 'planeHeight') {
+      if (key === 'planeWidth' || key === 'planeHeight' || key === 'cols' || key === 'rows') {
         updateTerrainFromParams()
       }
     })
@@ -137,24 +205,133 @@ export function createControlPanel() {
   }
 
   // Ajouter tous les contrôles
-  panel.appendChild(createCheckbox('Animation', 'animate'))
-  panel.appendChild(createCheckbox('Wireframe', 'showWireframe'))
+  // Général
+  generalSection.appendChild(createCheckbox('Animation', 'animate'))
+  generalSection.appendChild(createSlider('Vitesse Animation', 'flyingSpeed', -0.1, 0.1, 0.001))
 
-  // Contrôles FBM / bruit
-  panel.appendChild(createCheckbox('Utiliser FBM', 'useFBM'))
-  panel.appendChild(createSlider('Octaves FBM', 'fbmOctaves', 1, 8, 1))
-  panel.appendChild(createSlider('Lacunarité FBM', 'fbmLacunarity', 1.0, 4.0, 0.1))
-  panel.appendChild(createSlider('Gain FBM', 'fbmGain', 0.1, 1.0, 0.05))
+  // Terrain
+  terrainSection.appendChild(createCheckbox('Wireframe', 'showWireframe'))
+  terrainSection.appendChild(createSlider('Largeur terrain', 'planeWidth', 20, 300, 1))
+  terrainSection.appendChild(createSlider('Hauteur terrain', 'planeHeight', 20, 300, 1))
+  terrainSection.appendChild(createSlider('Nombre de colonnes', 'cols', 2, 100, 1))
+  terrainSection.appendChild(createSlider('Nombre de lignes', 'rows', 2, 100, 1))
 
-  // Taille du terrain
-  panel.appendChild(createSlider('Largeur terrain', 'planeWidth', 20, 300, 1))
-  panel.appendChild(createSlider('Hauteur terrain', 'planeHeight', 20, 300, 1))
-  panel.appendChild(createSlider('Vitesse Animation', 'flyingSpeed', -0.1, 0.1, 0.001))
-  panel.appendChild(createSlider('Échelle Bruit X', 'noiseScaleX', 0.001, 0.1, 0.001))
-  panel.appendChild(createSlider('Échelle Bruit Y', 'noiseScaleY', 0.001, 0.1, 0.001))
-  panel.appendChild(createSlider('Hauteur Min', 'heightMin', -20, 10, 0.5))
-  panel.appendChild(createSlider('Hauteur Max', 'heightMax', -10, 20, 0.5))
-  panel.appendChild(createSlider('Offset Y', 'yOffset', -10, 10, 0.1))
+  // Bruit de base
+  baseNoiseSection.appendChild(createSlider('Échelle Bruit X', 'noiseScaleX', 0.001, 0.1, 0.001))
+  baseNoiseSection.appendChild(createSlider('Échelle Bruit Y', 'noiseScaleY', 0.001, 0.1, 0.001))
+  baseNoiseSection.appendChild(createSlider('Hauteur Min', 'heightMin', -20, 10, 0.5))
+  baseNoiseSection.appendChild(createSlider('Hauteur Max', 'heightMax', -10, 20, 0.5))
+  baseNoiseSection.appendChild(createSlider('Offset Y', 'yOffset', -10, 10, 0.1))
+
+  // Contrôles FBM / bruit global
+  fbmGlobalSection.appendChild(createCheckbox('Utiliser FBM', 'useFBM'))
+  fbmGlobalSection.appendChild(createSlider('Octaves FBM', 'fbmOctaves', 1, 8, 1))
+  fbmGlobalSection.appendChild(createSlider('Lacunarité FBM', 'fbmLacunarity', 1.0, 4.0, 0.1))
+  fbmGlobalSection.appendChild(createSlider('Gain FBM', 'fbmGain', 0.1, 1.0, 0.05))
+
+  // Contrôles détaillés par octave FBM
+  const fbmDetailsTitle = document.createElement('h4')
+  fbmDetailsTitle.textContent = 'FBM par octave'
+  fbmDetailsTitle.style.cssText = `
+    margin: 10px 0 5px 0;
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.8);
+  `
+  fbmOctavesSection.appendChild(fbmDetailsTitle)
+
+  noiseParams.fbmOctavesParams.forEach((octave, index) => {
+    const container = document.createElement('div')
+    container.style.cssText = `
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      padding: 8px;
+      margin-bottom: 8px;
+    `
+
+    const header = document.createElement('div')
+    header.style.cssText = 'display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;'
+
+    const label = document.createElement('span')
+    label.textContent = `Octave ${index + 1}`
+    label.style.cssText = 'font-size: 12px; color: rgba(255, 255, 255, 0.9);'
+
+    const enableCheckbox = document.createElement('input')
+    enableCheckbox.type = 'checkbox'
+    enableCheckbox.checked = octave.enabled
+    enableCheckbox.style.cssText = 'width: 14px; height: 14px; cursor: pointer;'
+    enableCheckbox.addEventListener('change', (e) => {
+      noiseParams.fbmOctavesParams[index].enabled = (e.target as HTMLInputElement).checked
+    })
+
+    header.appendChild(label)
+    header.appendChild(enableCheckbox)
+    container.appendChild(header)
+
+    // Slider gain
+    const gainContainer = document.createElement('div')
+    gainContainer.style.cssText = 'display: flex; align-items: center; gap: 8px; margin-bottom: 4px;'
+
+    const gainLabel = document.createElement('span')
+    gainLabel.textContent = 'Gain'
+    gainLabel.style.cssText = 'font-size: 11px; color: rgba(255, 255, 255, 0.7); min-width: 40px;'
+
+    const gainSlider = document.createElement('input')
+    gainSlider.type = 'range'
+    gainSlider.min = '0.1'
+    gainSlider.max = '2.0'
+    gainSlider.step = '0.05'
+    gainSlider.value = octave.gain.toString()
+    gainSlider.style.cssText = 'flex: 1;'
+
+    const gainValue = document.createElement('span')
+    gainValue.textContent = octave.gain.toFixed(2)
+    gainValue.style.cssText = 'font-size: 11px; color: #AECC6F; min-width: 38px; text-align: right;'
+
+    gainSlider.addEventListener('input', (e) => {
+      const v = parseFloat((e.target as HTMLInputElement).value)
+      noiseParams.fbmOctavesParams[index].gain = v
+      gainValue.textContent = v.toFixed(2)
+    })
+
+    gainContainer.appendChild(gainLabel)
+    gainContainer.appendChild(gainSlider)
+    gainContainer.appendChild(gainValue)
+    container.appendChild(gainContainer)
+
+    // Slider lacunarité
+    const lacContainer = document.createElement('div')
+    lacContainer.style.cssText = 'display: flex; align-items: center; gap: 8px;'
+
+    const lacLabel = document.createElement('span')
+    lacLabel.textContent = 'Lacunarité'
+    lacLabel.style.cssText = 'font-size: 11px; color: rgba(255, 255, 255, 0.7); min-width: 60px;'
+
+    const lacSlider = document.createElement('input')
+    lacSlider.type = 'range'
+    lacSlider.min = '0.5'
+    lacSlider.max = '3.0'
+    lacSlider.step = '0.05'
+    lacSlider.value = octave.lacunarity.toString()
+    lacSlider.style.cssText = 'flex: 1;'
+
+    const lacValue = document.createElement('span')
+    lacValue.textContent = octave.lacunarity.toFixed(2)
+    lacValue.style.cssText = 'font-size: 11px; color: #AECC6F; min-width: 38px; text-align: right;'
+
+    lacSlider.addEventListener('input', (e) => {
+      const v = parseFloat((e.target as HTMLInputElement).value)
+      noiseParams.fbmOctavesParams[index].lacunarity = v
+      lacValue.textContent = v.toFixed(2)
+    })
+
+    lacContainer.appendChild(lacLabel)
+    lacContainer.appendChild(lacSlider)
+    lacContainer.appendChild(lacValue)
+    container.appendChild(lacContainer)
+
+    fbmOctavesSection.appendChild(container)
+  })
 
   // Bouton pour réinitialiser
   const resetButton = document.createElement('button')

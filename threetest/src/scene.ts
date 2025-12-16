@@ -21,12 +21,11 @@ export function createScene(cube: THREE.Mesh, cubewireframe: THREE.Mesh) {
   camera.position.set(10, 10, 10)
 
   // Lights
-  const ambientlight = new THREE.AmbientLight(0xffffff)
-  scene.add(ambientlight)
 
   const light = new THREE.DirectionalLight()
-  light.position.set(40, 30, 0)
+  light.position.set(1000, 500, 1000)
   light.target = cube
+  light.intensity = 4.0
   scene.add(light)
 
   // Helpers
