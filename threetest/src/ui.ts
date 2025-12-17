@@ -231,8 +231,8 @@ export function createControlPanel() {
   fbmGlobalSection.appendChild(createSlider('Amplitude initiale FBM', 'fbmInitialAmplitude', 0.1, 100.0, 0.1))
   fbmGlobalSection.appendChild(createSlider('Amp Decay', 'fbmAmplitudeDecay', 0.1, 5.0, 0.1))
   fbmGlobalSection.appendChild(createSlider('Fréquence initiale FBM', 'fbmInitialFrequency', 0.1, 50.0, 0.1))
-  fbmGlobalSection.appendChild(createSlider('Amplitude FBM', 'fbmAmplitude', 0.1, 100.0, 0.1))
-  fbmGlobalSection.appendChild(createSlider('Fréquence FBM', 'fbmFrequency', 0.1, 100.0, 0.1))
+  fbmGlobalSection.appendChild(createSlider('Amplitude FBM', 'fbmAmplitude', 0.0, 100.0, 0.1))
+  fbmGlobalSection.appendChild(createSlider('Fréquence FBM', 'fbmFrequency', 0.0, 1000.0, 1))
 
   // Contrôles détaillés par octave FBM
   const fbmDetailsTitle = document.createElement('h4')

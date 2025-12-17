@@ -37,6 +37,7 @@ const wireframe = new THREE.MeshBasicMaterial({ color: 0x950404, wireframe: true
 const material = new THREE.MeshLambertMaterial({ visible: true, vertexColors: true })
 
 const cube = new THREE.Mesh(geometry, material)
+cube.material.wireframe = true
 const cubewireframe = new THREE.Mesh(geometry, wireframe)
 
 // Rotate plane 90 degrees around X-axis to lay flat
@@ -88,23 +89,21 @@ function fbm2(x: number, y: number): number {
   let total = 0
   let octaves = noiseParams.fbmOctaves
 
+  let frequency = noiseParams.fbmInitialFrequency
+  let amplitude = noiseParams.fbmInitialAmplitude
 
-  for (let i = 1; i <= octaves; i++) {
-    let params = noiseParams.fbmOctavesParams[i]
-    if (params.enabled) {
-      if (i === 1) {
-        let frequency = noiseParams.fbmInitialFrequency
-        let amplitude = noiseParams.fbmInitialAmplitude
-        total += noise(x / frequency, y / frequency) * amplitude
-      } else {
-        let frequency = noiseParams.fbmInitialFrequency * (noiseParams.fbmLacunarity * i - 1)
-        let amplitude = noiseParams.fbmInitialAmplitude * (noiseParams.fbmAmplitudeDecay * i - 1)
-        total += noise(x / frequency, y / frequency) * amplitude
-      }
-    }
+  total = total + noise(x / frequency, y / frequency) * amplitude
+
+  frequency = frequency * noiseParams.fbmFrequency
+  amplitude = amplitude * noiseParams.fbmAmplitude
+
+  for (let i = 1; i < octaves; i++) {
+    total = total + noise(x * frequency, y * frequency) * amplitude
+    amplitude = amplitude * noiseParams.fbmAmplitudeDecay
+    frequency = frequency * noiseParams.fbmLacunarity
   }
 
-  return total / octaves
+  return total
 }
 
 function hnoise(x: number, y: number): number {

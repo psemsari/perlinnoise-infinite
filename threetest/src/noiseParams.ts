@@ -46,16 +46,16 @@ export const noiseParams: NoiseParams = {
   showWireframe: false, // Afficher ou masquer le maillage wireframe
   planeWidth: 100,     // Largeur "physique" du terrain
   planeHeight: 100,    // Hauteur "physique" du terrain
-  cols: 500,            // Nombre de colonnes (segments) dans la grille
-  rows: 500,            // Nombre de lignes (segments) dans la grille
+  cols: 100,            // Nombre de colonnes (segments) dans la grille
+  rows: 100,            // Nombre de lignes (segments) dans la grille
   useFBM: true,       // Utiliser le FBM ou un simple bruit
   fbmOctaves: 1,       // Nombre d'octaves pour le FBM
   fbmLacunarity: 2.0,  // Multiplicateur de fréquence entre les octaves
-  fbmInitialFrequency: 0.5,        // Fréquence initiale pour le FBM
+  fbmInitialFrequency: 5.0,        // Fréquence initiale pour le FBM
   fbmAmplitudeDecay: 1.0,        // Décay de l'amplitude entre les octaves
-  fbmInitialAmplitude: 3.0,        // Amplitude initiale pour le FBM
-  fbmAmplitude: 1.0,        // Amplitude pour le FBM
-  fbmFrequency: 2.0,        // Multiplicateur de fréquence entre les octaves
+  fbmInitialAmplitude: 9.0,        // Amplitude initiale pour le FBM
+  fbmAmplitude: 0.0,        // Amplitude pour le FBM
+  fbmFrequency: 0.0,        // Multiplicateur de fréquence entre les octaves
   fbmOctavesParams: Array.from({ length: FBM_OCTAVES_MAX }, () => ({
     enabled: true,
     amplitude: 1.0,
