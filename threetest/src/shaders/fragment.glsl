@@ -1,21 +1,25 @@
 uniform float uTime;
+uniform vec3 uLightDirection;
+uniform float uLightIntensity;
+uniform float uAmbientLight;
 varying vec3 vNormal;
 varying vec3 vPosition;
 
 void main() {
-  // Couleur de base (rouge)
-  vec3 color = vec3(1.0, 0.0, 0.0);
+  // Couleur de base
+  vec3 color = vec3(128.0/255.0, 88.0/255.0, 62.0/255.0);
   
-  // Animation simple : pulse entre 0.3 et 1.0
-  float pulse = sin(uTime * 2.0) * 0.5 + 0.5;
-  pulse = pulse * 0.7 + 0.3;
+  // Direction de la lumière (depuis la surface vers la lumière)
+  vec3 lightDir = normalize(-uLightDirection);
   
-  // Appliquer le pulse à la couleur
-  //color *= pulse;
+  // Calcul de l'éclairage diffus avec la normale
+  float NdotL = max(dot(vNormal, lightDir), 0.0);
   
-  // Ajouter un léger effet basé sur la normale (éclairage simple)
-  float light = dot(vNormal, vec3(0.5, 1.0, 0.8));
-  light = light * 0.5 + 0.5;
+  // Éclairage combiné : ambiant + diffus
+  float light = uAmbientLight + NdotL * uLightIntensity;
+  
+  // S'assurer que la lumière ne dépasse pas 1.0
+  light = min(light, 1.0);
   
   gl_FragColor = vec4(color * light, 1.0);
 }

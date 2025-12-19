@@ -26,14 +26,16 @@ const shaderMaterial = new THREE.ShaderMaterial({
   uniforms: {
     uTime: { value: 0.0 },
     uNoiseScale: { value: 0.009 }, // Échelle du bruit (plus petit = plus de détails)
-    uNoiseAmplitude: { value: 100.0 } // Amplitude du bruit (hauteur de la déformation)
+    uNoiseAmplitude: { value: 100.0 }, // Amplitude du bruit (hauteur de la déformation)
+    uLightDirection: { value: new THREE.Vector3(1, 1, 1000) }
   }
 })
+
 
 // Créer un plan de 10x10 avec le shader
 const geometry = new THREE.PlaneGeometry(100, 100, 1000, 1000)
 const plane = new THREE.Mesh(geometry, shaderMaterial)
-plane.material.wireframe = true
+plane.material.wireframe = false
 // Tourner le plan pour qu'il soit horizontal (visible depuis le haut)
 plane.rotation.x = -Math.PI / 2
 scene.add(plane)
@@ -41,6 +43,13 @@ scene.add(plane)
 // Ajouter un helper pour les axes
 const axesHelper = new THREE.AxesHelper(3)
 scene.add(axesHelper)
+
+// Light
+const light = new THREE.DirectionalLight()
+light.position.set(1, 1, 1000)
+light.target = plane
+light.intensity = 4.0
+scene.add(light)
 
 // Contrôles de la caméra
 const controls = new MapControls(camera, renderer.domElement)
